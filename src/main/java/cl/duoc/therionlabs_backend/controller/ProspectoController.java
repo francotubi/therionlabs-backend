@@ -4,6 +4,7 @@ import cl.duoc.therionlabs_backend.dto.ProspectoSyncRequest;
 import cl.duoc.therionlabs_backend.entity.Prospecto;
 import cl.duoc.therionlabs_backend.exception.ProspectoDuplicadoException;
 import cl.duoc.therionlabs_backend.service.ProspectoService;
+import cl.duoc.therionlabs_backend.service.ProspectoRechazoService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +16,17 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/prospectos")
 public class ProspectoController {
-
     private final ProspectoService prospectoService;
+    private final ProspectoRechazoService rechazoService;
 
-    public ProspectoController(ProspectoService prospectoService) {
+    public ProspectoController(
+            ProspectoService prospectoService,
+            ProspectoRechazoService rechazoService
+    ) {
         this.prospectoService = prospectoService;
+        this.rechazoService = rechazoService;
     }
+
 
     @PostMapping("/sync")
     public ResponseEntity<RespuestaSync> sincronizar(
@@ -46,8 +52,13 @@ public class ProspectoController {
                     "Credencial de dispositivo inválida"
             );
 
-        } catch (ProspectoDuplicadoException e) {
 
+        } catch (ProspectoDuplicadoException e) {
+            rechazoService.registrarRechazo(
+                    token,
+                    request,
+                    e.getMessage()
+            );
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(new RespuestaSync(
@@ -55,7 +66,6 @@ public class ProspectoController {
                             "CONFLICTO",
                             e.getMessage()
                     ));
-
         } catch (IllegalArgumentException e) {
 
             throw new ResponseStatusException(

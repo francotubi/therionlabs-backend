@@ -18,4 +18,14 @@ public interface CaptadorRepository
     Optional<Captador> buscarParaActualizar(
             @Param("id") UUID id
     );
+
+    // Buscar captadores por su identificador de Android
+    Optional<Captador> findByIdentificadorLocal(
+            String identificadorLocal
+    );
+
+    // Comprobar si CAP-01, CAP-02, etc. ya existen
+    boolean existsByIdentificadorLocal(
+            String identificadorLocal
+    );
 }

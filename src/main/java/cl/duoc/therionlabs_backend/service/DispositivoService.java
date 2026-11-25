@@ -91,6 +91,37 @@ public class DispositivoService {
         return dispositivo;
     }
 
+    @Transactional
+    public CredencialActivacion renovarCredencial(UUID captadorId) {
+        Captador captador = captadorRepository.findById(captadorId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Captador no encontrado"));
+        if (!captador.isActivo()) {
+            throw new IllegalArgumentException(
+                    "El captador está deshabilitado");
+        }
+        Dispositivo dispositivo = dispositivoRepository
+                .findByCaptadorId(captadorId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "El captador no tiene un dispositivo registrado"));
+
+        byte[] bytes = new byte[32];
+        secureRandom.nextBytes(bytes);
+        String credencialNueva = Base64.getUrlEncoder()
+                .withoutPadding()
+                .encodeToString(bytes);
+        dispositivo.setCredencialHash(
+                calcularHash(credencialNueva)
+        );
+        dispositivoRepository.save(dispositivo);
+        return new CredencialActivacion(
+                dispositivo.getId(),
+                credencialNueva
+        );
+    }
+
+
     private String calcularHash(String texto) {
         try {
             byte[] hash = MessageDigest.getInstance("SHA-256")
