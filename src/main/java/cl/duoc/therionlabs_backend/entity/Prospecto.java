@@ -1,11 +1,12 @@
 package cl.duoc.therionlabs_backend.entity;
 
 import jakarta.persistence.*;
-import java.util.UUID;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.UUID;
 
 @Entity
 @Table(name = "prospectos")
@@ -14,10 +15,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Prospecto {
 
-    @Id
-    private UUID id;
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean eliminado = false;
 
-    // Relaciones con las tablas existentes
+    @Id private UUID id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "evento_id", nullable = false)
     private Evento evento;
@@ -26,7 +28,6 @@ public class Prospecto {
     @JoinColumn(name = "captador_id", nullable = false)
     private Captador captador;
 
-    // Datos personales
     @Column(nullable = false)
     private String rut;
 
@@ -45,15 +46,11 @@ public class Prospecto {
     private String fechaNacimiento;
     private String celular;
     private String email;
-
-    // Datos academicos
     private String establecimiento;
     private String comunaResidencia;
     private String comunaEstablecimiento;
     private String actividadActual;
     private String jornada;
-
-    // Preferencias
     private String region;
     private String sede;
     private String nivelInteres;
@@ -67,11 +64,7 @@ public class Prospecto {
     private String observaciones;
 
     private boolean autorizaContacto;
-
-    // Fecha de captura en milisegundos
     private Long fechaCaptura;
-
-    // Informacion opcional del telefono
     private String fotoRuta;
     private Double latitud;
     private Double longitud;

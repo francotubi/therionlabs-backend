@@ -24,44 +24,28 @@ public class EstadisticasAdminController {
 
     public EstadisticasAdminController(
             ProspectoRepository prospectoRepository,
-            @Value("${THERIONLABS_EXPORT_KEY}")
-            String claveAdministrativa
-    ) {
+            @Value("${THERIONLABS_EXPORT_KEY}") String claveAdministrativa) {
         this.prospectoRepository = prospectoRepository;
-        this.claveAdministrativa =
-                claveAdministrativa.getBytes(StandardCharsets.UTF_8);
+        this.claveAdministrativa = claveAdministrativa.getBytes(StandardCharsets.UTF_8);
     }
 
     @GetMapping("/prospectos-por-evento")
     public ResponseEntity<?> prospectosPorEvento(
-            @RequestHeader(
-                    value = "X-Admin-Key",
-                    required = false
-            ) String claveRecibida
-    ) {
+            @RequestHeader(value = "X-Admin-Key", required = false) String claveRecibida) {
+        if (claveRecibida == null
+                || !MessageDigest.isEqual(
+                        claveAdministrativa, claveRecibida.getBytes(StandardCharsets.UTF_8))) {
 
-        // Comprobar clave administrativa
-        if (claveRecibida == null ||
-                !MessageDigest.isEqual(
-                        claveAdministrativa,
-                        claveRecibida.getBytes(StandardCharsets.UTF_8)
-                )) {
-
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+        List<Prospecto> prospectos = prospectoRepository.findAll();
 
-        // Contar los prospectos aceptados por evento
-        List<Prospecto> prospectos =
-                prospectoRepository.findAll();
-
-        Map<UUID, Long> totales = prospectos.stream()
-                .filter(p -> p.getEvento() != null)
-                .collect(Collectors.groupingBy(
-                        p -> p.getEvento().getId(),
-                        Collectors.counting()
-                ));
+        Map<UUID, Long> totales =
+                prospectos.stream()
+                        .filter(p -> p.getEvento() != null && !p.isEliminado())
+                        .collect(
+                                Collectors.groupingBy(
+                                        p -> p.getEvento().getId(), Collectors.counting()));
 
         return ResponseEntity.ok(totales);
     }

@@ -19,19 +19,30 @@ public class EventoController {
         this.eventoService = eventoService;
     }
 
-    // Obtener todos los eventos activos
     @GetMapping
-    public List<Evento> listarEventos() {
-        return eventoService.listarEventosActivos();
+    public List<Evento> listarEventos(
+            @RequestParam(defaultValue = "false") boolean incluirEliminados) {
+        return incluirEliminados
+                ? eventoService.listarCambios()
+                : eventoService.listarEventosActivos();
     }
 
-    // Buscar un evento por su UUID
     @GetMapping("/{id}")
     public Evento obtenerEvento(@PathVariable UUID id) {
         return eventoService.buscarPorId(id);
     }
 
-    // Crear un evento
+    @PutMapping("/{id}")
+    public Evento actualizar(@PathVariable UUID id, @RequestBody Evento datos) {
+        return eventoService.actualizar(id, datos);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminar(@PathVariable UUID id) {
+        eventoService.eliminar(id);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Evento crearEvento(@RequestBody Evento evento) {

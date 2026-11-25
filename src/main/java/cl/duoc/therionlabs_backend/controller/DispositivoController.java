@@ -15,40 +15,28 @@ public class DispositivoController {
 
     private final DispositivoService dispositivoService;
 
-    public DispositivoController(
-            DispositivoService dispositivoService) {
+    public DispositivoController(DispositivoService dispositivoService) {
         this.dispositivoService = dispositivoService;
     }
 
     @GetMapping("/verificar")
-    public RespuestaDispositivo verificar(
-            @RequestHeader("X-Device-Token") String token) {
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public RespuestaDispositivo verificar(@RequestHeader("X-Device-Token") String token) {
 
         try {
-            Dispositivo dispositivo =
-                    dispositivoService.validarCredencial(token);
+            Dispositivo dispositivo = dispositivoService.validarCredencial(token);
 
             return new RespuestaDispositivo(
                     dispositivo.getId(),
                     dispositivo.getCaptador().getId(),
                     dispositivo.getCaptador().getIdentificadorLocal(),
-                    true
-            );
-
+                    true);
 
         } catch (SecurityException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Credencial no válida"
-            );
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credencial no válida");
         }
     }
 
-
     public record RespuestaDispositivo(
-            UUID dispositivoId,
-            UUID captadorId,
-            String identificadorLocal,
-            boolean autorizado
-    ) {}
+            UUID dispositivoId, UUID captadorId, String identificadorLocal, boolean autorizado) {}
 }

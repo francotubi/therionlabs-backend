@@ -1,6 +1,7 @@
 package cl.duoc.therionlabs_backend.entity;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -8,8 +9,10 @@ import java.util.UUID;
 @Table(name = "eventos")
 public class Evento {
 
-    @Id
-    private UUID id;
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean eliminado = false;
+
+    @Id private UUID id;
 
     @Column(nullable = false)
     private String nombre;
@@ -29,8 +32,15 @@ public class Evento {
     @Column(nullable = false)
     private boolean activo = true;
 
-    public Evento() {
+    public boolean isEliminado() {
+        return eliminado;
     }
+
+    public void setEliminado(boolean eliminado) {
+        this.eliminado = eliminado;
+    }
+
+    public Evento() {}
 
     public UUID getId() {
         return id;
