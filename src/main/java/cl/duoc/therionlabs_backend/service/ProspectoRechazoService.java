@@ -23,51 +23,34 @@ public class ProspectoRechazoService {
     public ProspectoRechazoService(
             ProspectoRechazadoRepository rechazoRepository,
             DispositivoService dispositivoService,
-            ParticipacionEventoRepository participacionRepository
-    ) {
+            ParticipacionEventoRepository participacionRepository) {
         this.rechazoRepository = rechazoRepository;
         this.dispositivoService = dispositivoService;
         this.participacionRepository = participacionRepository;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void registrarRechazo(
-            String token,
-            ProspectoSyncRequest request,
-            String motivo
-    ) {
+    public void registrarRechazo(String token, ProspectoSyncRequest request, String motivo) {
 
-        // Identificar al captador mediante su token
-        Dispositivo dispositivo =
-                dispositivoService.validarCredencial(token);
+        Dispositivo dispositivo = dispositivoService.validarCredencial(token);
 
         Captador captador = dispositivo.getCaptador();
 
-        // Comprobar que pertenece al evento
-        boolean participa = participacionRepository
-                .existsByCaptadorIdAndEventoId(
-                        captador.getId(),
-                        request.eventoId()
-                );
+        boolean participa =
+                participacionRepository.existsByCaptadorIdAndEventoId(
+                        captador.getId(), request.eventoId());
 
         if (!participa) {
-            throw new SecurityException(
-                    "Captador no autorizado para este evento"
-            );
+            throw new SecurityException("Captador no autorizado para este evento");
         }
 
-        // Buscar un rechazo anterior del mismo prospecto
-        ProspectoRechazado rechazo = rechazoRepository
-                .findById(request.id())
-                .orElseGet(ProspectoRechazado::new);
+        ProspectoRechazado rechazo =
+                rechazoRepository.findById(request.id()).orElseGet(ProspectoRechazado::new);
 
-        // Evitar modificar un rechazo de otro captador
-        if (rechazo.getProspectoId() != null &&
-                (!rechazo.getCaptadorId().equals(captador.getId()) ||
-                        !rechazo.getEventoId().equals(request.eventoId()))) {
-            throw new SecurityException(
-                    "El identificador pertenece a otro registro"
-            );
+        if (rechazo.getProspectoId() != null
+                && (!rechazo.getCaptadorId().equals(captador.getId())
+                        || !rechazo.getEventoId().equals(request.eventoId()))) {
+            throw new SecurityException("El identificador pertenece a otro registro");
         }
 
         rechazo.setProspectoId(request.id());

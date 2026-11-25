@@ -3,8 +3,8 @@ package cl.duoc.therionlabs_backend.controller;
 import cl.duoc.therionlabs_backend.dto.ProspectoSyncRequest;
 import cl.duoc.therionlabs_backend.entity.Prospecto;
 import cl.duoc.therionlabs_backend.exception.ProspectoDuplicadoException;
-import cl.duoc.therionlabs_backend.service.ProspectoService;
 import cl.duoc.therionlabs_backend.service.ProspectoRechazoService;
+import cl.duoc.therionlabs_backend.service.ProspectoService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +20,10 @@ public class ProspectoController {
     private final ProspectoRechazoService rechazoService;
 
     public ProspectoController(
-            ProspectoService prospectoService,
-            ProspectoRechazoService rechazoService
-    ) {
+            ProspectoService prospectoService, ProspectoRechazoService rechazoService) {
         this.prospectoService = prospectoService;
         this.rechazoService = rechazoService;
     }
-
 
     @PostMapping("/sync")
     public ResponseEntity<RespuestaSync> sincronizar(
@@ -34,50 +31,26 @@ public class ProspectoController {
             @RequestBody ProspectoSyncRequest request) {
 
         try {
-            Prospecto prospecto =
-                    prospectoService.recibirProspecto(token, request);
+            Prospecto prospecto = prospectoService.recibirProspecto(token, request);
 
             return ResponseEntity.ok(
                     new RespuestaSync(
-                            prospecto.getId(),
-                            "SINCRONIZADO",
-                            "Prospecto recibido correctamente"
-                    )
-            );
+                            prospecto.getId(), "SINCRONIZADO", "Prospecto recibido correctamente"));
 
         } catch (SecurityException e) {
 
             throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Credencial de dispositivo inválida"
-            );
-
+                    HttpStatus.UNAUTHORIZED, "Credencial de dispositivo inválida");
 
         } catch (ProspectoDuplicadoException e) {
-            rechazoService.registrarRechazo(
-                    token,
-                    request,
-                    e.getMessage()
-            );
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body(new RespuestaSync(
-                            request.id(),
-                            "CONFLICTO",
-                            e.getMessage()
-                    ));
+            rechazoService.registrarRechazo(token, request, e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new RespuestaSync(request.id(), "CONFLICTO", e.getMessage()));
         } catch (IllegalArgumentException e) {
 
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    e.getMessage()
-            );
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 
-    public record RespuestaSync(
-            UUID prospectoId,
-            String estado,
-            String mensaje
-    ) {}
+    public record RespuestaSync(UUID prospectoId, String estado, String mensaje) {}
 }

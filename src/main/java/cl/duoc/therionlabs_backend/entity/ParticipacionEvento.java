@@ -1,18 +1,14 @@
 package cl.duoc.therionlabs_backend.entity;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(
         name = "participaciones_evento",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        columnNames = {"captador_id", "evento_id"}
-                )
-        }
-)
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"captador_id", "evento_id"})})
 public class ParticipacionEvento {
 
     @Id
@@ -35,8 +31,7 @@ public class ParticipacionEvento {
     @Column(nullable = false)
     private boolean activo = true;
 
-    public ParticipacionEvento() {
-    }
+    public ParticipacionEvento() {}
 
     public UUID getId() {
         return id;

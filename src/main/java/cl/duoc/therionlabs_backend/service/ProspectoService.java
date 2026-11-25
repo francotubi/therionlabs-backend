@@ -46,7 +46,7 @@ public class ProspectoService {
                         .buscarParaActualizar(eventoId)
                         .orElseThrow(() -> new IllegalArgumentException("Evento no encontrado"));
 
-        if (!evento.isActivo() || evento.isEliminado())
+        if (evento.isEliminado())
             throw new IllegalArgumentException("El evento no está disponible");
         boolean participo =
                 participacionRepository.existsByCaptadorIdAndEventoId(captador.getId(), eventoId);
@@ -77,6 +77,11 @@ public class ProspectoService {
             return anterior;
         }
 
+        if (!evento.isActivo()
+                && (evento.getCerradoEn() == null
+                        || datos.getFechaCaptura() == null
+                        || datos.getFechaCaptura() > evento.getCerradoEn().toEpochMilli()))
+            throw new IllegalArgumentException("El evento está cerrado para nuevas capturas");
         ValidacionesServidor.prospecto(datos);
         if (datos.getRut() == null || datos.getRut().isBlank()) {
             throw new IllegalArgumentException("El RUT es obligatorio");

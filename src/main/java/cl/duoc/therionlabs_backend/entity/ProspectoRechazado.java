@@ -1,9 +1,10 @@
 package cl.duoc.therionlabs_backend.entity;
 
 import jakarta.persistence.*;
+
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -15,9 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ProspectoRechazado {
 
-    // UUID original generado en Android
-    @Id
-    private UUID prospectoId;
+    @Id private UUID prospectoId;
 
     @Column(nullable = false)
     private UUID eventoId;
@@ -25,7 +24,6 @@ public class ProspectoRechazado {
     @Column(nullable = false)
     private UUID captadorId;
 
-    // Datos para identificar el rechazo
     private String rut;
     private String nombre;
     private String apellidos;

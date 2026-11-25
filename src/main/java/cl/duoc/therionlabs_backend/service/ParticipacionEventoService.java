@@ -45,7 +45,7 @@ public class ParticipacionEventoService {
                         .findById(eventoId)
                         .orElseThrow(() -> new IllegalArgumentException("Evento no encontrado"));
 
-        if (!evento.isActivo() || evento.isEliminado()) {
+        if (evento.isEliminado() || (!evento.isActivo() && evento.getCerradoEn() == null)) {
             throw new IllegalArgumentException("El evento no está activo");
         }
         ParticipacionEvento participacionActual =

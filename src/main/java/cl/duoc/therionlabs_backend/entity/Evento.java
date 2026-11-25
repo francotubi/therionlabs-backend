@@ -12,6 +12,16 @@ public class Evento {
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean eliminado = false;
 
+    private java.time.Instant cerradoEn;
+
+    public java.time.Instant getCerradoEn() {
+        return cerradoEn;
+    }
+
+    public void setCerradoEn(java.time.Instant valor) {
+        cerradoEn = valor;
+    }
+
     @Id private UUID id;
 
     @Column(nullable = false)

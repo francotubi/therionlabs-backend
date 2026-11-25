@@ -76,7 +76,24 @@ public class EventoService {
         evento.setFecha(datos.getFecha());
         evento.setActividad(datos.getActividad().trim());
         evento.setComuna(datos.getComuna());
-        evento.setActivo(datos.isActivo());
+        if (datos.isActivo() != evento.isActivo())
+            throw new IllegalArgumentException(
+                    "Utiliza la opción Cerrar evento para terminar la captación");
+        return eventos.save(evento);
+    }
+
+    public Evento cerrar(UUID id) {
+        Evento evento =
+                eventos.buscarParaActualizar(id)
+                        .orElseThrow(() ->
+                                new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND, "Evento no encontrado"));
+        if (evento.isEliminado())
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Evento eliminado");
+        if (evento.isActivo()) {
+            evento.setActivo(false);
+            evento.setCerradoEn(java.time.Instant.now());
+        }
         return eventos.save(evento);
     }
 

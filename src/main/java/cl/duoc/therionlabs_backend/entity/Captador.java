@@ -1,14 +1,14 @@
 package cl.duoc.therionlabs_backend.entity;
 
 import jakarta.persistence.*;
+
 import java.util.UUID;
 
 @Entity
 @Table(name = "captadores")
 public class Captador {
 
-    @Id
-    private UUID id;
+    @Id private UUID id;
 
     @Column(nullable = false)
     private String nombre;
@@ -19,8 +19,7 @@ public class Captador {
     @Column(nullable = false)
     private boolean activo = true;
 
-    public Captador() {
-    }
+    public Captador() {}
 
     public UUID getId() {
         return id;

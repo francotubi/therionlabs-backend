@@ -37,6 +37,11 @@ public class EventoController {
         return eventoService.actualizar(id, datos);
     }
 
+    @PostMapping("/{id}/cerrar")
+    public Evento cerrar(@PathVariable UUID id) {
+        return eventoService.cerrar(id);
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void eliminar(@PathVariable UUID id) {

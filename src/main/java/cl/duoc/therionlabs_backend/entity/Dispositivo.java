@@ -1,6 +1,7 @@
 package cl.duoc.therionlabs_backend.entity;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -8,17 +9,13 @@ import java.util.UUID;
 @Table(name = "dispositivos")
 public class Dispositivo {
 
-    @Id
-    private UUID id;
+    @Id private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "captador_id", nullable = false)
     private Captador captador;
 
-    @Column(name = "credencial_hash",
-            nullable = false,
-            length = 64,
-            unique = true)
+    @Column(name = "credencial_hash", nullable = false, length = 64, unique = true)
     private String credencialHash;
 
     @Column(nullable = false)
@@ -30,8 +27,7 @@ public class Dispositivo {
     @Column(name = "ultimo_acceso")
     private LocalDateTime ultimoAcceso;
 
-    public Dispositivo() {
-    }
+    public Dispositivo() {}
 
     public UUID getId() {
         return id;
